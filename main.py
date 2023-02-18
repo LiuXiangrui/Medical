@@ -19,4 +19,8 @@ if __name__ == '__main__':
     b = a.get_fdata(dtype=np.float64)
     print(b.shape)
 
+    a = nib.load("./mri_00000273.nii")
+    b = a.get_fdata(dtype=np.float64)
+    print(b.shape)
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
