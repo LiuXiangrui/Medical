@@ -3,6 +3,7 @@ import os
 import nibabel as nib
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 
 def interlaced_split(frame: np.ndarray) -> tuple:
@@ -26,10 +27,9 @@ def write_yuv(frames: list, yuv_path: str) -> None:
 
 
 def convert_ct_to_sequences(nii_folder_: str, rec_folder: str) -> None:
+    mse_list = []
     for i, nii_filename in enumerate(os.listdir(nii_folder_)):
         if os.path.splitext(nii_filename)[-1] != ".nii":
-            continue
-        if i >= 56:
             continue
 
         nii_file = nib.load(os.path.join(nii_folder_, nii_filename))  # axis is [z, x, y]
@@ -39,7 +39,10 @@ def convert_ct_to_sequences(nii_folder_: str, rec_folder: str) -> None:
         recon_data = np.load(os.path.join(rec_folder, os.path.splitext(nii_filename)[0] + ".npy"))
 
         mse = np.mean((origin_data - recon_data) ** 2)
-        print(nii_filename, ": mse error=", mse)
+        mse_list.append(mse)
+
+    plt.plot(list(range(len(mse_list))), mse_list)
+    plt.savefig('./mse.png')
 
 
 if __name__ == "__main__":
