@@ -36,4 +36,4 @@ for seq in os.listdir(results_folder):
                 bpp_per_qp[qp] += parse_results(os.path.join(results_folder, seq, str(qp), file)) / num_seqs
 
 for qp, bpp in bpp_per_qp.items():
-    print("QP: {}, BPP = {}".format(qp, bpp))
+    print("QP: {}, BPP = {}".format(qp, bpp * 2))  # note that bpp * 2 is the actual bpp
