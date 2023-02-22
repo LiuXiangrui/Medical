@@ -29,7 +29,7 @@ def write_yuv(frames: list, yuv_path: str) -> None:
             chroma_placeholder.astype(np.uint8).tofile(f)
 
 
-def convert_ct_to_sequences(nii_folder_: str, sequences_folder_: str, min_: float = -2048., max_: float = 2048., bit_depth: int = 16, choice: int = 2) -> None:
+def convert_ct_to_sequences(nii_folder_: str, sequences_folder_: str, bit_depth: int = 16) -> None:
     os.makedirs(sequences_folder_, exist_ok=True)
     for nii_filename in tqdm(os.listdir(nii_folder_)):
         if os.path.splitext(nii_filename)[-1] != ".nii":
@@ -39,20 +39,20 @@ def convert_ct_to_sequences(nii_folder_: str, sequences_folder_: str, min_: floa
         os.makedirs(sequence_folder, exist_ok=True)
 
         nii_file = nib.load(os.path.join(nii_folder_, nii_filename))  # axis is [z, x, y]
+        data = np.array(nii_file.get_fdata(dtype=np.float64))
 
-        data = np.array(nii_file.get_fdata(dtype=np.float64)).clip(min=min_, max=max_)
-
-        # first choice: clip
-        if choice == 1:
-            data = (data - min_) / (max_ - min_) * (2 ** bit_depth)
-        # second choice: shift to zero point
-        elif choice == 2:
-            data = data + data.min()
-        # third choice: scale to 0~65536
-        else:
-            min_ = data.min()
-            max_ = data.max()
-            data = (data - min_) / (max_ - min_) * (2 ** bit_depth)
+        #
+        # # first choice: clip
+        # if choice == 1:
+        #     data = (data - min_) / (max_ - min_) * (2 ** bit_depth)
+        # # second choice: shift to zero point
+        # elif choice == 2:
+        #     data = data + data.min()
+        # # third choice: scale to 0~65536
+        # else:
+        min_ = data.min()
+        max_ = data.max()
+        data = (data - min_) / (max_ - min_) * (2 ** bit_depth)
 
         data = data.astype(np.uint16)
 
@@ -68,15 +68,11 @@ def convert_ct_to_sequences(nii_folder_: str, sequences_folder_: str, min_: floa
             odd_frames.append(odd_frame)
             even_frames.append(even_frame)
 
-        write_yuv(frames=odd_frames, yuv_path=os.path.join(sequence_folder, os.path.splitext(nii_filename)[0] + "_{}x{}_{}_odd.yuv".format(width, height, num_frames)))
-        write_yuv(frames=even_frames, yuv_path=os.path.join(sequence_folder, os.path.splitext(nii_filename)[0] + "_{}x{}_{}_even.yuv".format(width, height, num_frames)))
+        write_yuv(frames=odd_frames, yuv_path=os.path.join(sequence_folder, os.path.splitext(nii_filename)[0] + "_{}x{}_{}_{}_{}_odd.yuv".format(width, height, num_frames, int(min_), int(max_))))
+        write_yuv(frames=even_frames, yuv_path=os.path.join(sequence_folder, os.path.splitext(nii_filename)[0] + "_{}x{}_{}_{}_{}_even.yuv".format(width, height, num_frames, int(min_), int(max_))))
 
 
 if __name__ == "__main__":
-    nii_folder = r"D:\MedicalImageDataset\Mosmed_COVID-19_CT\CT-"
-    sequences_folder = r"D:\CTSequences"
-    for i in range(1, 4):
-        if i != 1:
-            break
-        for j in range(2, 5):
-            convert_ct_to_sequences(nii_folder_=nii_folder + str(j), sequences_folder_=sequences_folder + "_{}".format(i), choice=i)
+    nii_folder = ""
+    seq_folder = ""
+    convert_ct_to_sequences(nii_folder_=nii_folder, sequences_folder_=seq_folder)
