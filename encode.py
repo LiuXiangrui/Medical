@@ -2,16 +2,16 @@ import os
 from multiprocessing import Pool
 
 
-encoder_path = r"C:\Users\XiangruiLiu\Desktop\encoder_app.exe"
+encoder_path = r"C:\Users\XiangruiLiu\Desktop\avs_enc.exe"
 
-decoder_path = r"C:\Users\XiangruiLiu\Desktop\decoder_app.exe"
+decoder_path = r"C:\Users\XiangruiLiu\Desktop\avs_dec.exe"
 
-cfg_path = r"C:\Users\XiangruiLiu\Desktop\Medical\encode_RA.cfg"
+cfg_path = r"C:\Users\xiangrliu3\Desktop\Medical\encode_RA.cfg"
 
-qp_list = [22, 27, 32, 37]
+qp_list = [22, 23, 24, 25]
 
-sequences_folder = "./"
-rec_sequences_folder = "./"
+sequences_folder = r"D:\CTSample"
+rec_sequences_folder = r"D:\RecCTSample"
 
 enc_cmd_list = []
 dec_cmd_list = []
