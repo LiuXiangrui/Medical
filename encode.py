@@ -1,5 +1,11 @@
 import os
 from multiprocessing import Pool
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument("--qp", nargs='+')
+
+qp_list = [int(item) for item in parser.parse_args().qp]
 
 
 num_proc = 28
@@ -10,14 +16,10 @@ decoder_path = r"/public/xiangrliu3/hpm-HPM-13.0/bin/app_decoder"
 
 cfg_path = r"/public/xiangrliu3/Medical/encode_RA.cfg"
 
-# qp_list = [22, 23, 24, 25]
-# qp_list = [26, 27, 28, 29]
-# qp_list = [30, 31, 32, 33]
-qp_list = [34, 35, 36, 37]
 
 
-sequences_folder = r"/public/xiangrliu3/CT"
-rec_sequences_folder = r"/public/xiangrliu3/RecCT"
+sequences_folder = r"/public/xiangrliu3/CTSequences"
+rec_sequences_folder = r"/public/xiangrliu3/RecCTSequences"
 
 os.makedirs(rec_sequences_folder, exist_ok=True)
 
@@ -34,7 +36,7 @@ for seq_name in os.listdir(sequences_folder):
             rec_filepath = os.path.join(rec_sequences_folder, seq_name, str(qp), yuv_filename)
             res_filepath = os.path.join(rec_sequences_folder, seq_name, str(qp), os.path.splitext(yuv_filename)[0] + '.txt')
 
-            _, _, resolution, frames, _ = os.path.split(yuv_filepath)[-1].split('_')
+            _, _, resolution, frames, _, _, _ = os.path.split(yuv_filepath)[-1].split('_')
             width, height = resolution.split('x')
 
             enc_cmd = "{} --config {} --input {} --output {} --width {} --height {} --frames {} --op_qp {} > {}".format(
