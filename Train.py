@@ -35,16 +35,18 @@ class MedicalDataset(Dataset):
 
 
 if __name__ == "__main__":
-    h5_filepath = r"C:\Users\xiangrliu3\Desktop\QP22.h5py"
+    qp = 16
+    train_filepath = r"C:\Users\xiangrliu3\Desktop\TrainCTH5\{}.h5py".format(qp)
+    eval_filepath = r"C:\Users\xiangrliu3\Desktop\TestCTH5\{}.h5py".format(qp)
 
-    experiments_dir = r"C:\Users\xiangrliu3\Desktop\ExperimentsQP22"
+    experiments_dir = r"C:\Users\xiangrliu3\Desktop\ExperimentsQP" + str(qp)
 
-    # checkpoints = r"C:\Users\xiangrliu3\Desktop\ExperimentsQP22\2023-02-24_18-10\Checkpoints\Network_039.pth"
     checkpoints = None
+    checkpoints = r"C:\Users\xiangrliu3\Desktop\ExperimentsQP16\2023-03-02_15-23\Checkpoints\Network_013.pth"
 
     batch_size = 8
-    lr = 2e-4
-    lr_decay_milestone = [50, 200, 300, 400]
+    lr = 1e-4
+    lr_decay_milestone = [50, 100, 150, 200]
     lr_decay_factor = 0.5
     device = "cuda"
 
@@ -62,10 +64,10 @@ if __name__ == "__main__":
     tensorboard = SummaryWriter(log_dir=str(tb_dir), flush_secs=30)
 
     train_dataloader = DataLoader(
-        dataset=MedicalDataset(h5_file=h5_filepath, transform=transforms.Compose(
+        dataset=MedicalDataset(h5_file=train_filepath, transform=transforms.Compose(
             [transforms.RandomHorizontalFlip(p=0.4), transforms.RandomVerticalFlip(p=0.4)])),
         batch_size=batch_size, shuffle=True)
-    eval_dataloader = DataLoader(dataset=MedicalDataset(h5_file=h5_filepath), batch_size=batch_size, shuffle=False)
+    eval_dataloader = DataLoader(dataset=MedicalDataset(h5_file=eval_filepath), batch_size=batch_size, shuffle=False)
 
     net = Network().to(device)
     optimizer = Adam([{'params': net.parameters(), 'initial_lr': lr}], lr=lr)
@@ -80,9 +82,10 @@ if __name__ == "__main__":
         # noinspection PyTypeChecker
         ckpt = torch.load(checkpoints, map_location=device)
         best_psnr = ckpt['best_psnr']
-        start_epoch = ckpt["epoch"] + 1
-        net.load_state_dict(ckpt["network"])
         optimizer.load_state_dict(ckpt["optimizer"])
+        start_epoch = ckpt["epoch"] + 1
+
+        net.load_state_dict(ckpt["network"])
     else:
         print("\n===========Training from scratch===========\n")
 

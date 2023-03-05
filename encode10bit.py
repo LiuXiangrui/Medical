@@ -37,7 +37,7 @@ for seq_name in os.listdir(sequences_folder):
             _, _, resolution, frames, _, _, _ = os.path.split(yuv_filepath)[-1].split('_')
             width, height = resolution.split('x')
 
-            enc_cmd = "{} --config {} --input {} --output {} --width {} --height {} --frames {} --op_qp {} > {}".format(
+            enc_cmd = "{} --config {} --input {} --output {} --width {} --height {} --frames {} --op_qp {} --input_bit_depth 10 > {}".format(
                 encoder_path, cfg_path, yuv_filepath, bin_filepath, width, height, frames, qp, res_filepath
             )
 
