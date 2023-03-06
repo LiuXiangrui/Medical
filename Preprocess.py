@@ -4,7 +4,7 @@ import nibabel as nib
 import numpy as np
 from tqdm import tqdm
 
-from CompressCT import write_yuv, bit_depth_conversion_based_on_interlacing
+from Compress import write_yuv, bit_depth_conversion_based_on_interlacing
 
 
 def convert_ct_to_sequences(nii_folder_: str, sequences_folder_: str, bit_depth: int = 16, crop_height: int = 128, crop_width: int = 128) -> None:
