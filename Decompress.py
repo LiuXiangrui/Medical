@@ -94,16 +94,19 @@ class Decompression:
             rec_nii = np.stack(slices, axis=-1).transpose([2, 1, 0])
             rec_nii = rec_nii[:, :, :, np.newaxis]
 
-            rec_nii = rec_nii[:, :, ::-1, :]  # FOR MRI, I found the sequence is inverse
+            rec_nii = rec_nii[:, :, ::-1, :]  # FOR MRI, I found the sequence is inverse, so just reverse the sequence
 
         rec_nii = rec_nii / (2 ** bit_depth) * (self.max_ - self.min_) + self.min_
-        np.save(self.args.nii_filepath, rec_nii)
+
+        npy_name = os.path.splitext(self.args.nii_filepath)[0] + '.npy'
+        np.save(npy_name, rec_nii)  # note that the ext of file saved by numpy must be '.npy' {-_-}
+        os.rename(npy_name, self.args.nii_filepath)
 
     def decode_flags(self):
         flag_filepath = os.path.join(self.temp_folder_path, "flag.bin")
         with open(flag_filepath, mode='rb') as f:
             flag = struct.unpack('B', f.read(1))[0]
-            self.data_type = "CT" if flag > 4 else "MRI"
+            self.data_type = "CT" if flag >= 4 else "MRI"
             self.use_DCBS = False if flag == 4 or flag == 0 else True
             self.shift_to_10_bit = False if flag == 6 or flag == 2 else True
 
